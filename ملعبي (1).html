@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>ملعبي</title>
+<link rel="icon" type="image/png" href="soccer.png">
+<link rel="apple-touch-icon" href="soccer.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+/* ============================================================
+   1) المتغيرات والثيمات
+   ============================================================ */
+:root{
+  --bg:#f4f7f2;--card:#fff;--tx:#17301c;--mu:#5d6f60;
+  --g:#1f8a3b;--r:#c0392b;--b:#d8e2d6;--teamB:#e0592a;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --gl:rgba(255,255,255,.5);--gl2:rgba(255,255,255,.7);--ln:rgba(255,255,255,.75);
+  --in:rgba(255,255,255,.55);--sh:0 10px 34px rgba(20,70,50,.16);
+  --hi:rgba(255,255,255,.6);--sheen:rgba(255,255,255,.4);
+  --b1:#d6f3e2;--b2:#cde7f7;--b3:#e6ddf8;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#101a12;--card:#18251b;--tx:#e8f1e9;--mu:#9bb09e;--g:#4cc36b;--r:#ef6b5b;--b:#2a3d2d;--teamB:#ff8a5c;
+  --gl:rgba(26,42,34,.5);--gl2:rgba(44,66,55,.6);--ln:rgba(255,255,255,.15);--in:rgba(0,0,0,.25);
+  --sh:0 10px 34px rgba(0,0,0,.45);--hi:rgba(255,255,255,.16);--sheen:rgba(255,255,255,.07);
+  --b1:#0a1511;--b2:#0b1a1f;--b3:#14122a;
+}}
+:root[data-theme="dark"]{
+  --bg:#101a12;--card:#18251b;--tx:#e8f1e9;--mu:#9bb09e;--g:#4cc36b;--r:#ef6b5b;--b:#2a3d2d;--teamB:#ff8a5c;
+  --gl:rgba(26,42,34,.5);--gl2:rgba(44,66,55,.6);--ln:rgba(255,255,255,.15);--in:rgba(0,0,0,.25);
+  --sh:0 10px 34px rgba(0,0,0,.45);--hi:rgba(255,255,255,.16);--sheen:rgba(255,255,255,.07);
+  --b1:#0a1511;--b2:#0b1a1f;--b3:#14122a;
+}
+
+/* ============================================================
+   2) الأساسيات
+   ============================================================ */
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);line-height:1.6;min-height:100vh}
+body{font-family:Tajawal,"SF Arabic","Segoe UI",Tahoma,sans-serif;
+  background:linear-gradient(160deg,var(--b1),var(--b2) 55%,var(--b3)) fixed}
+img.ic{width:20px;height:20px;vertical-align:middle;filter:var(--ico,none)}
+.icw{filter:invert(1)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ico:invert(1) opacity(.9)}}
+:root[data-theme="dark"]{--ico:invert(1) opacity(.9)}
+
+/* خلفية بخطوط الملعب */
+.bg-lines{position:fixed;inset:0;z-index:-2;pointer-events:none;opacity:.06;
+  background:
+   linear-gradient(90deg,transparent 49.6%,#000 49.6% 50.4%,transparent 50.4%),
+   radial-gradient(circle at 50% 50%,transparent 120px,#000 121px 123px,transparent 124px);
+}
+.blobs{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+.blobs i{position:absolute;border-radius:50%;filter:blur(70px);opacity:.55;animation:float 14s ease-in-out infinite}
+.blobs i:nth-child(1){width:340px;height:340px;background:#34d27b;top:-80px;right:-60px}
+.blobs i:nth-child(2){width:300px;height:300px;background:#38bdf8;top:38%;left:-90px;animation-delay:-5s}
+.blobs i:nth-child(3){width:320px;height:320px;background:#a78bfa;bottom:-100px;right:10%;animation-delay:-9s}
+
+/* ============================================================
+   3) الترويسة والتنقل
+   ============================================================ */
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;margin:10px 12px;border-radius:24px;
+  color:var(--tx);display:flex;align-items:center;gap:12px;padding:12px 16px;text-align:right;font-size:22px;font-weight:800;
+  background:var(--gl);-webkit-backdrop-filter:blur(24px) saturate(180%);backdrop-filter:blur(24px) saturate(180%);
+  border:1px solid var(--ln);box-shadow:var(--sh),inset 0 1px 0 var(--hi)}
+header small{display:block;font-size:12px;font-weight:500;color:var(--mu)}
+.logo{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;
+  background:linear-gradient(145deg,#4ade80,#16a34a);box-shadow:0 6px 16px rgba(22,163,74,.4),inset 0 1px 0 rgba(255,255,255,.6)}
+.logo img{width:30px;height:30px;filter:invert(1);animation:spinBall 9s linear infinite}
+header .lgb{margin-inline-start:auto;font-size:13px;padding:8px 14px;border-radius:99px}
+body::before{content:"";position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top,0px);z-index:19;
+  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
+
+nav{position:fixed;z-index:30;left:50%;transform:translateX(-50%);bottom:calc(10px + env(safe-area-inset-bottom,0px));
+  width:min(560px,calc(100% - 24px));padding:6px;gap:4px;border-radius:30px;display:flex;overflow-x:auto;
+  background:var(--gl);-webkit-backdrop-filter:blur(24px) saturate(180%);backdrop-filter:blur(24px) saturate(180%);
+  border:1px solid var(--ln);box-shadow:var(--sh),inset 0 1px 0 var(--hi)}
+nav button{flex:1;white-space:normal;background:transparent;border:0;border-radius:24px;padding:8px 4px;
+  font-size:12px;color:var(--mu);cursor:pointer;line-height:1.3;transition:all .25s ease}
+nav button .nic{display:block;width:28px;height:28px;margin:0 auto 2px;padding:3px;border-radius:9px;background:#fff;
+  box-shadow:0 2px 6px rgba(0,0,0,.18);transition:transform .25s}
+nav button span.lbl{display:block;font-weight:700}
+nav button.on{color:var(--g);box-shadow:inset 0 1px 0 var(--hi)}
+nav button.on .nic{background:linear-gradient(145deg,#4ade80,#16a34a);transform:translateY(-4px) scale(1.12)}
+nav button.on .nic img{filter:invert(1)}
+nav button:active .nic{transform:scale(.9)}
+
+main{max-width:760px;margin:0 auto;padding:0 12px 130px}
+
+/* ============================================================
+   4) البطاقات والعناصر
+   ============================================================ */
+.card{background:var(--gl);-webkit-backdrop-filter:blur(24px) saturate(180%);backdrop-filter:blur(24px) saturate(180%);
+  border:1px solid var(--ln);border-radius:24px;padding:16px;margin:10px 0;position:relative;overflow:hidden;
+  box-shadow:var(--sh),inset 0 1px 0 var(--hi);animation:rise .5s ease both}
+.card::before{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(135deg,var(--sheen),transparent 38%);pointer-events:none}
+.card:nth-child(2){animation-delay:.05s}.card:nth-child(3){animation-delay:.1s}.card:nth-child(4){animation-delay:.15s}
+.card h3,.card .ch{display:flex;align-items:center;gap:8px;margin:4px 0 10px;font-size:16px;font-weight:800}
+.ch img{width:22px;height:22px}
+
+button,input,select,textarea{font:inherit;color:var(--tx);background:var(--in);border:1px solid var(--ln);
+  border-radius:14px;padding:11px 12px;max-width:100%}
+input,select,textarea{width:100%;box-shadow:inset 0 1px 3px rgba(0,0,0,.08)}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--g);outline-offset:1px}
+label{display:block;margin:12px 0 2px;color:var(--mu);font-size:14px;font-weight:500}
+button{cursor:pointer;font-weight:700;transition:transform .15s,box-shadow .2s,background .2s}
+button:active{transform:scale(.95)}
+button:disabled{opacity:.35;text-decoration:line-through;cursor:not-allowed}
+button.p{background:linear-gradient(180deg,#43dd88,#16a34a);color:#fff;border-color:rgba(255,255,255,.45);
+  box-shadow:0 8px 20px rgba(22,163,74,.38),inset 0 1px 0 rgba(255,255,255,.55)}
+button.d{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.35);color:var(--r)}
+button.on{background:linear-gradient(180deg,#43dd88,#16a34a);color:#fff}
+.iconbtn{display:inline-flex;align-items:center;gap:6px}
+.iconbtn img{width:18px;height:18px}
+button.ok img{filter:none}
+button.no img{filter:none}
+
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.row.between{justify-content:space-between}
+.tag{padding:3px 12px;border-radius:99px;font-size:13px;color:#fff;font-weight:700;box-shadow:0 0 12px rgba(0,0,0,.15)}
+.free{background:var(--g)}.full{background:var(--r)}.pend{background:#b8860b}
+.mu{color:var(--mu);font-size:14px}.err{color:var(--r);min-height:20px;font-size:14px}
+table{width:100%;border-collapse:collapse}
+td,th{padding:8px 6px;border-bottom:1px solid var(--b);text-align:right;font-size:14px}
+.sc{overflow-x:auto}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px}
+.tile{display:flex;justify-content:space-between;align-items:center;gap:6px;padding:10px 12px;border-radius:16px;
+  font-size:14px;background:var(--gl2);border:1px solid var(--ln);box-shadow:inset 0 1px 0 var(--hi);transition:transform .2s}
+.tile:hover{transform:translateY(-2px)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips button{padding:8px 12px;font-size:14px;border-radius:12px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.stat{padding:12px 6px;border-radius:20px;text-align:center;background:var(--gl);border:1px solid var(--ln);
+  backdrop-filter:blur(20px);box-shadow:var(--sh),inset 0 1px 0 var(--hi);animation:rise .5s ease both}
+.stat b{display:block;font-size:28px;color:var(--g)}
+.hero{text-align:center;padding:26px 18px}
+.hero .logo{margin:0 auto 12px;width:70px;height:70px;border-radius:22px}
+.hero .logo img{width:44px;height:44px}
+
+/* ============================================================
+   5) محرّر التشكيلة (الملعب)
+   ============================================================ */
+.seg{display:flex;gap:6px;background:var(--gl2);border:1px solid var(--ln);border-radius:16px;padding:5px;margin:8px 0}
+.seg button{flex:1;border:0;background:transparent;color:var(--mu);padding:9px;border-radius:12px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:7px}
+.seg button .dot{width:12px;height:12px;border-radius:50%;background:currentColor}
+.seg button[data-team-btn="A"] .dot{background:var(--g)}
+.seg button[data-team-btn="B"] .dot{background:var(--teamB)}
+.seg button.on{background:var(--gl);box-shadow:inset 0 1px 0 var(--hi);color:var(--tx)}
+.seg button.on[data-team-btn="A"]{color:var(--g)}
+.seg button.on[data-team-btn="B"]{color:var(--teamB)}
+
+.pitch{position:relative;border-radius:20px;padding:16px 10px;display:flex;flex-direction:column;justify-content:space-between;
+  gap:12px;min-height:430px;overflow:hidden;border:1px solid rgba(255,255,255,.25);
+  background:repeating-linear-gradient(0deg,#2f9e4f 0 34px,#2b9148 34px 68px);
+  box-shadow:inset 0 0 40px rgba(0,0,0,.28)}
+.pitch.teamB{background:repeating-linear-gradient(0deg,#2f7fa0 0 34px,#2b7595 34px 68px)}
+.pitch::before{content:"";position:absolute;left:50%;top:50%;width:96px;height:96px;transform:translate(-50%,-50%);
+  border:2px solid rgba(255,255,255,.4);border-radius:50%;pointer-events:none}
+.pitch::after{content:"";position:absolute;left:6%;right:6%;top:50%;height:2px;background:rgba(255,255,255,.4);pointer-events:none}
+.pline{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;position:relative;z-index:1}
+.slot{width:72px;min-height:62px;border-radius:13px;padding:6px 4px;color:#fff;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:2px;background:rgba(255,255,255,.14);border:1px dashed rgba(255,255,255,.6);
+  backdrop-filter:blur(3px);transition:transform .2s,background .2s;line-height:1.15}
+.slot:active{transform:scale(.93)}
+.slot .poscode{font-size:12px;font-weight:800;opacity:.9;letter-spacing:.5px}
+.slot .pname{font-size:11px;font-weight:700;text-align:center;word-break:break-word;max-width:66px}
+.slot.empty .pname{opacity:.7;font-weight:500}
+.slot.filled{background:rgba(255,255,255,.96);color:#123;border-style:solid;border-color:#fff;
+  box-shadow:0 6px 16px rgba(0,0,0,.28);animation:pop .3s ease}
+.slot.filled .poscode{color:var(--g)}
+.pitch.teamB .slot.filled .poscode{color:var(--teamB)}
+.teamA .slot.filled{animation-delay:.0s}
+
+/* ============================================================
+   6) النافذة المنبثقة (إدخال لاعب)
+   ============================================================ */
+.modal{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.45);backdrop-filter:blur(3px);
+  display:flex;align-items:flex-end;justify-content:center;animation:fade .2s ease}
+.modal[hidden]{display:none}
+.msheet{background:var(--card);width:min(460px,100%);border-radius:22px 22px 0 0;padding:18px;
+  box-shadow:0 -10px 40px rgba(0,0,0,.3);animation:up .3s cubic-bezier(.2,.9,.3,1.2);border:1px solid var(--ln)}
+@media (min-width:560px){.modal{align-items:center}.msheet{border-radius:22px}}
+.msheet h4{margin:0 0 4px;display:flex;align-items:center;gap:8px}
+.msheet .who{margin-bottom:10px}
+
+/* ============================================================
+   7) الحركات (Animations)
+   ============================================================ */
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes up{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-26px)}}
+@keyframes pop{0%{transform:scale(.7);opacity:0}70%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+@keyframes spinBall{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+#app>*{animation:fadeIn .35s ease both}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+@media (max-width:420px){nav button{font-size:11px}.slot{width:64px}}
+</style></head><body>
+<div class="bg-lines"></div>
+<div class="blobs"><i></i><i></i><i></i></div>
+
+<!-- الترويسة -->
+<header>
+  <div class="logo"><img src="soccer.png" alt="⚽"></div>
+  <div>ملعبي<small>احجز ملعب حيّك بسهولة</small></div>
+  <button class="lgb" id="lg"></button>
+</header>
+
+<!-- شريط التنقل -->
+<nav id="nav"></nav>
+
+<!-- المحتوى -->
+<main id="app">جارٍ التحميل…</main>
+
+<!-- نافذة إدخال اللاعب -->
+<div class="modal" id="modal" hidden>
+  <div class="msheet">
+    <h4><img class="ic" id="mic" src="soccer-jersey.png" alt=""> <span id="mtitle">إضافة لاعب</span></h4>
+    <p class="mu who" id="mwho"></p>
+    <input id="minput" placeholder="اسم اللاعب">
+    <div class="row" style="margin-top:14px">
+      <button class="d" id="mdel">إزالة</button>
+      <button class="p iconbtn" id="msave" style="flex:1"><img class="icw" src="football-flag.png" alt="">حفظ</button>
+      <button id="mcancel">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   1) البيانات الثابتة
+   ============================================================ */
+const DEF=["حي 500 تيرا حمراء","حي 500 ماتيكو","كامي لقديم 1","كامي لقديم 2","لافيجي","20 أوت 1","20 أوت 2","حي 700","شناوة بولكروة"];
+const HOURS=[];for(let h=8;h<=23;h++)HOURS.push(h);
+
+/* التشكيلة: الصفوف من الهجوم (أعلى) إلى الحارس (أسفل) */
+const POSINFO={GK:"حارس المرمى",RB:"ظهير أيمن",LB:"ظهير أيسر",CB1:"قلب دفاع ١",CB2:"قلب دفاع ٢",
+  RM:"جناح أيمن",LM:"جناح أيسر",CM:"وسط الميدان",CAM:"صانع ألعاب",ST1:"مهاجم ١",ST2:"مهاجم ٢"};
+const ROWS=[["ST1","ST2"],["LM","CM","CAM","RM"],["LB","CB1","CB2","RB"],["GK"]];
+const TEAMNAME={A:"الفريق الأول",B:"الفريق الثاني"};
+
+/* ============================================================
+   2) أدوات مساعدة
+   ============================================================ */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const today=()=>{const d=new Date();return new Date(d-d.getTimezoneOffset()*6e4).toISOString().slice(0,10)};
+const addDays=(s,n)=>{const d=new Date(s+"T12:00:00Z");d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10)};
+const hh=h=>String(h).padStart(2,"0")+":00";
+
+/* الحالة */
+let db,user,uid=null,isOwner=false,tab="book",sel=0,curId=null;
+let S={st:{},res:[],bans:[],reps:[],adm:[]};
+let F={date:today(),hour:8,stad:null,msg:"",nm:"",nid:"",lineup:{A:{},B:{}},team:"A"};
+let editing=null; /* سياق النافذة المنبثقة {team,pos} */
+
+const sdoc=i=>({name:DEF[i],price:1000,admins:[],...(S.st[i]||{})});
+const cur=()=>S.adm.find(a=>a.id===curId)||null;
+const isAdmin=i=>isOwner||(cur()&&cur().stad===i);
+const sha=async s=>[...new Uint8Array(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s)))].map(b=>b.toString(16).padStart(2,"0")).join("");
+const myStads=()=>DEF.map((_,i)=>i).filter(isAdmin);
+function covers(r,date,hour){ if(r.status==="rejected")return false; if(r.hour!==hour)return false;
+ if(!r.tournament)return r.date===date;
+ for(let k=0;k<r.weeks;k++)if(addDays(r.date,7*k)===date)return true;return false}
+const busy=(i,date,hour)=>S.res.some(r=>r.stad===i&&covers(r,date,hour));
+const banned=(nid,i)=>S.bans.find(b=>b.nid===nid&&(b.stad===-1||b.stad===i));
+const rid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const teamCount=t=>Object.values(F.lineup[t]||{}).filter(Boolean).length;
+
+/* ============================================================
+   3) العرض الرئيسي (الترويسة + التبويبات)
+   ============================================================ */
+function render(){
+ const adm=isOwner||myStads().length>0;
+ const c=cur(),lg=$("#lg");lg.textContent=c?"👤 "+c.name+" ✕":"🔐 دخول المسؤول";
+ lg.onclick=()=>{if(cur())logout();else{tab="login";F.msg="";render()}};
+ const tabs=[["book","stadium.png","حجز"],["tour","world-cup.png","بطولة"],["mine","football-flag.png","حجوزاتي"]];
+ if(adm)tabs.push(["admin","football-uniform.png","المسؤول"]);
+ if(isOwner)tabs.push(["owner","training.png","الإدارة"]);
+ $("#nav").innerHTML=tabs.map(([k,ic,lb])=>`<button class="${tab===k?"on":""}" data-t="${k}"><img class="nic" src="${ic}" alt=""><span class="lbl">${lb}</span></button>`).join("");
+ $("#nav").onclick=e=>{const t=e.target.closest("button")?.dataset.t;if(t){tab=t;F.msg="";render()}};
+ $("#app").innerHTML=({book:vBook,tour:vTour,mine:vMine,admin:vAdmin,owner:vOwner,login:vLogin})[tab]();
+ bind();
+}
+
+/* لوحة حالة الملاعب */
+function board(){
+ const n=DEF.filter((_,i)=>!busy(i,F.date,F.hour)).length;
+ return `<div class="card"><div class="ch"><img class="ic" src="stadium.png" alt="">حالة الملاعب</div>
+ <div class="row between"><span class="mu">${F.date} · ${hh(F.hour)}</span>
+ <span class="mu"><b style="color:var(--g)">${n} متاح</b> · <b style="color:var(--r)">${DEF.length-n} محجوز</b></span></div>
+ <div class="grid" style="margin-top:8px">${DEF.map((_,i)=>{const b=busy(i,F.date,F.hour);
+ return `<div class="tile"><span>${esc(sdoc(i).name)}</span><span class="tag ${b?"full":"free"}">${b?"محجوز":"متاح"}</span></div>`}).join("")}</div></div>`;
+}
+
+/* ============================================================
+   4) محرّر التشكيلة على شكل ملعب
+   ============================================================ */
+function slotHTML(team,p){
+ const name=(F.lineup[team]||{})[p]||"";
+ return `<button class="slot ${name?"filled":"empty"}" data-slot data-team="${team}" data-pos="${p}">
+   <span class="poscode">${p}</span><span class="pname">${name?esc(name):"أضف"}</span></button>`;
+}
+function pitchHTML(team){
+ const t=F.team===team?"":"";
+ return `<div class="pitch ${team==="B"?"teamB":"teamA"} ${t}">
+   ${ROWS.map(row=>`<div class="pline">${row.map(p=>slotHTML(team,p)).join("")}</div>`).join("")}
+ </div>`;
+}
+function lineupEditor(){
+ const t=F.team;
+ return `<div class="card"><div class="ch"><img class="ic" src="football-court.png" alt="">تشكيلة اللاعبين (لفريقين)</div>
+ <p class="mu">اضغط على أي مركز (حارس، ظهير أيمن/أيسر، قلب دفاع، وسط، مهاجم…) لكتابة اسم اللاعب.</p>
+ <div class="seg">
+   <button data-team-btn="A" class="${t==="A"?"on":""}"><span class="dot"></span>${TEAMNAME.A} (${teamCount("A")})</button>
+   <button data-team-btn="B" class="${t==="B"?"on":""}"><span class="dot"></span>${TEAMNAME.B} (${teamCount("B")})</button>
+ </div>
+ ${pitchHTML(t)}
+ <div class="row between" style="margin-top:10px">
+   <span class="mu">الإجمالي: ${teamCount("A")+teamCount("B")} لاعب</span>
+   <button class="d" id="clearL" style="font-size:13px;padding:7px 12px">مسح التشكيلة</button>
+ </div></div>`;
+}
+
+/* ============================================================
+   5) صفحات الحجز والبطولة
+   ============================================================ */
+function personFields(){return `<label>اسم الحاجز</label><input id="nm" value="${esc(F.nm)}">
+ <label>رقم بطاقة التعريف الوطنية (18 رقما)</label><input id="nid" inputmode="numeric" maxlength="18" value="${esc(F.nid)}">`}
+
+function vBook(){
+ return `<div class="card"><div class="ch"><img class="ic" src="stadium.png" alt="">احجز ملعبك</div>
+ <p class="mu">ساعة واحدة كحد أقصى — مجاناً.</p>
+ <label>التاريخ</label><input type="date" id="date" min="${today()}" value="${F.date}">
+ <label>الساعة</label><div class="chips">${HOURS.map(h=>`<button class="${h===F.hour?"on":""}" data-h="${h}" ${F.stad!=null&&busy(F.stad,F.date,h)?"disabled":""}>${hh(h)}</button>`).join("")}</div>
+ </div>${board()}
+ <div class="card"><div class="ch"><img class="ic" src="soccer-jersey.png" alt="">بيانات الحجز</div>
+ <label>الملعب</label><select id="stad"><option value="">اختر ملعبا</option>${DEF.map((_,i)=>`<option value="${i}" ${F.stad===i?"selected":""} ${busy(i,F.date,F.hour)?"disabled":""}>${esc(sdoc(i).name)}${busy(i,F.date,F.hour)?" (محجوز)":""}</option>`).join("")}</select>
+ ${personFields()}</div>
+ ${lineupEditor()}
+ <p class="err">${F.msg}</p><button class="p iconbtn" id="send" style="width:100%"><img class="icw" src="football-flag.png" alt="">إرسال الحجز</button>`;
+}
+
+function vTour(){
+ const i=F.stad??0,p=sdoc(i).price,w=F.weeks||4;
+ return `<div class="card"><div class="ch"><img class="ic" src="world-cup.png" alt="">حجز بطولة (مدفوع)</div>
+ <p class="mu">حصة أسبوعية ثابتة في نفس اليوم والساعة لعدد أسابيع تختاره. الدفع مع مسؤول الملعب.</p>
+ <label>الملعب</label><select id="stad">${DEF.map((_,k)=>`<option value="${k}" ${k===i?"selected":""}>${esc(sdoc(k).name)}</option>`).join("")}</select>
+ <label>تاريخ أول حصة</label><input type="date" id="date" min="${today()}" value="${F.date}">
+ <label>الساعة</label><select id="hour">${HOURS.map(h=>`<option value="${h}" ${h===F.hour?"selected":""}>${hh(h)}</option>`).join("")}</select>
+ <label>عدد الأسابيع</label><input type="number" id="weeks" min="1" max="52" value="${w}">
+ <p><b>السعر: ${p} دج × ${w} = ${p*w} دج</b></p>
+ ${personFields()}</div>
+ ${lineupEditor()}
+ <p class="err">${F.msg}</p><button class="p iconbtn" id="sendT" style="width:100%"><img class="icw" src="world-cup.png" alt="">إرسال طلب البطولة</button>`;
+}
+
+/* ============================================================
+   6) صفحات العرض (حجوزاتي / المسؤول / الإدارة / الدخول)
+   ============================================================ */
+function stTag(r){return `<span class="tag ${r.status==="confirmed"?"free":r.status==="rejected"?"full":"pend"}">${{confirmed:"مؤكد",rejected:"مرفوض",pending:"في الانتظار"}[r.status]}</span>`}
+
+function miniLineup(fm){
+ if(!fm)return"";
+ const col=t=>{const o=fm[t]||{};const ks=Object.keys(o).filter(k=>o[k]);
+  if(!ks.length)return"";
+  return `<div style="flex:1;min-width:130px"><b style="color:${t==="A"?"var(--g)":"var(--teamB)"}">${TEAMNAME[t]}</b>
+  ${ks.map(k=>`<div class="mu" style="font-size:13px">${k}: ${esc(o[k])}</div>`).join("")}</div>`};
+ return `<div class="row" style="align-items:flex-start;margin-top:6px">${col("A")}${col("B")}</div>`;
+}
+
+function resRow(r,adm){const s=sdoc(r.stad).name;
+ return `<div class="card"><div class="row between"><b>${esc(s)}</b>${stTag(r)}</div>
+ <div class="mu">${r.tournament?`بطولة: ${r.weeks} أسابيع من ${r.date} — ${r.total} دج`:r.date} · ${hh(r.hour)}</div>
+ <div>${esc(r.name)}${adm?` — ${esc(r.nid)}`:""}</div>
+ ${r.formation?miniLineup(r.formation):`<div class="mu">اللاعبون: ${esc((r.players||[]).join("، "))}</div>`}
+ ${adm?`<div class="row" style="margin-top:8px">
+   <button class="p iconbtn ok" data-ok="${r.id}"><img src="football-flag.png" alt="">تأكيد</button>
+   <button class="d iconbtn no" data-del="${r.id}"><img src="training.png" alt="">حذف</button>
+   <button data-rep="${r.id}">إبلاغ</button>
+   <button class="d" data-ban="${r.id}">حظر</button></div>`
+ :`<button class="d" data-del="${r.id}" style="margin-top:6px">إلغاء</button>`}</div>`}
+
+function vMine(){const m=S.res.filter(r=>r.uid===uid).sort((a,b)=>a.date<b.date?1:-1);
+ return m.length?m.map(r=>resRow(r,false)).join(""):`<p class="mu">لا توجد حجوزات.</p>`}
+
+function vAdmin(){const ms=myStads();if(!ms.length)return"";if(!ms.includes(sel))sel=ms[0];
+ const s=sdoc(sel),rs=S.res.filter(r=>r.stad===sel).sort((a,b)=>a.date<b.date?-1:1);
+ const bl=S.bans.filter(b=>b.stad===sel||b.stad===-1),rp=S.reps.filter(r=>r.stad===sel);
+ const pc=rs.filter(r=>r.status==="pending").length,cc=rs.filter(r=>r.status==="confirmed").length;
+ return `<div class="stats"><div class="stat"><b>${pc}</b><span class="mu">في الانتظار</span></div>
+ <div class="stat"><b>${cc}</b><span class="mu">مؤكد</span></div><div class="stat"><b>${rp.length}</b><span class="mu">بلاغات</span></div></div>
+ <div class="card"><div class="ch"><img class="ic" src="football-uniform.png" alt="">إعدادات ملعبك</div>
+ <label>ملعبك</label><select id="asel">${ms.map(i=>`<option value="${i}" ${i===sel?"selected":""}>${esc(sdoc(i).name)}</option>`).join("")}</select>
+ <label>اسم الملعب</label><input id="sname" value="${esc(s.name)}">
+ <label>سعر حصة البطولة (دج / ساعة)</label><input id="sprice" type="number" value="${s.price}">
+ <button class="p" id="ssave" style="margin-top:10px;width:100%">حفظ التعديلات</button></div>
+ <div class="card"><div class="ch"><img class="ic" src="stadium.png" alt="">الحجوزات</div>
+ ${rs.map(r=>resRow(r,true)).join("")||`<p class="mu">لا توجد حجوزات.</p>`}</div>
+ <div class="card"><div class="ch"><img class="ic" src="training.png" alt="">قائمة الحظر</div>
+ <div class="row"><input id="bnid" placeholder="رقم التعريف" style="flex:1"><input id="bwhy" placeholder="السبب" style="flex:1"><button class="d" id="badd">حظر</button></div>
+ <div class="sc"><table>${bl.map(b=>`<tr><td>${esc(b.name||"")}</td><td>${esc(b.nid)}</td><td>${esc(b.reason||"")}</td><td>${b.stad===-1?"عام":""}</td><td>${b.stad===-1&&!isOwner?"":`<button data-unban="${b.id}">رفع</button>`}</td></tr>`).join("")||"<tr><td class='mu'>القائمة فارغة</td></tr>"}</table></div></div>
+ <div class="card"><div class="ch"><img class="ic" src="football-flag.png" alt="">البلاغات</div>
+ <div class="sc"><table>${rp.map(r=>`<tr><td>${esc(r.name)}</td><td>${esc(r.nid)}</td><td>${esc(r.reason)}</td><td>${r.date}</td></tr>`).join("")||"<tr><td class='mu'>لا توجد بلاغات</td></tr>"}</table></div></div>`}
+
+function vOwner(){return `<div class="card"><div class="ch"><img class="ic" src="training.png" alt="">إنشاء حساب مسؤول</div>
+ <p class="mu">يدخل المسؤول من أعلى التطبيق باسمه وكلمة السر، ويتحكم في ملعبه فقط.</p>
+ <label>الملعب</label><select id="osel">${DEF.map((_,i)=>`<option value="${i}">${esc(sdoc(i).name)}</option>`).join("")}</select>
+ <label>اسم المسؤول</label><input id="an"><label>كلمة السر (6 أحرف على الأقل)</label><input id="ap" autocomplete="off">
+ <p class="err">${F.msg}</p><button class="p" id="aadd" style="width:100%">إنشاء الحساب</button></div>
+ ${DEF.map((_,i)=>{const l=S.adm.filter(a=>a.stad===i);
+ return `<div class="card"><div class="ch"><img class="ic" src="stadium.png" alt="">${esc(sdoc(i).name)}</div>
+ ${l.map(a=>`<div class="row between" style="margin-top:8px"><span>👤 ${esc(a.name)}</span><button class="d" data-rma="${a.id}">حذف</button></div>`).join("")||`<div class="mu">لا يوجد مسؤول</div>`}</div>`}).join("")}`}
+
+function vLogin(){return `<div class="card hero"><div class="logo"><img src="soccer-jersey.png" alt=""></div>
+ <h2 style="margin:0 0 4px">دخول المسؤول</h2><p class="mu">سجّل الدخول باسمك وكلمة السر لإدارة ملعبك.</p>
+ <label>الاسم</label><input id="ln" autocomplete="username"><label>كلمة السر</label><input id="lp" type="password" autocomplete="current-password">
+ <p class="err">${F.msg}</p><button class="p" id="lgo" style="width:100%">دخول</button></div>`}
+
+/* ============================================================
+   7) الأفعال (دخول / خروج / إرسال)
+   ============================================================ */
+async function doLogin(){const n=$("#ln").value.trim(),p=$("#lp").value;let a=null;
+ for(const x of S.adm){if(x.name.toLowerCase()===n.toLowerCase()&&await sha(x.salt+p)===x.hash){a=x;break}}
+ if(!a){F.msg="الاسم أو كلمة السر غير صحيحة.";render();return}
+ curId=a.id;try{sessionStorage.setItem("adm",a.id)}catch(e){}F.msg="";tab="admin";render()}
+function logout(){curId=null;try{sessionStorage.removeItem("adm")}catch(e){}tab="book";render()}
+
+/* نافذة إدخال اللاعب */
+function openSlot(team,pos){
+ editing={team,pos};
+ const name=(F.lineup[team]||{})[pos]||"";
+ $("#mic").src="soccer-jersey.png";
+ $("#mtitle").textContent=POSINFO[pos]||pos+" — "+pos;
+ $("#mwho").textContent=TEAMNAME[team]+" · المركز: "+(POSINFO[pos]||pos);
+ $("#minput").value=name;
+ $("#mdel").style.display=name?"":"none";
+ $("#modal").hidden=false;setTimeout(()=>$("#minput").focus(),60);
+}
+function closeModal(){editing=null;$("#modal").hidden=true}
+function saveSlot(){
+ if(!editing)return;
+ const v=$("#minput").value.trim();
+ F.lineup[editing.team]=F.lineup[editing.team]||{};
+ if(v)F.lineup[editing.team][editing.pos]=v;else delete F.lineup[editing.team][editing.pos];
+ closeModal();render();
+}
+function delSlot(){if(!editing)return;delete F.lineup[editing.team][editing.pos];closeModal();render()}
+
+const setSt=(i,p)=>db.collection("st").doc(String(i)).set({...sdoc(i),...p});
+const addBan=(nid,name,reason,stad)=>db.collection("bans").doc(rid()).set({nid,name,reason,stad});
+
+async function submit(t){
+ const nm=$("#nm").value.trim(),nid=$("#nid").value.trim();
+ F.nm=nm;F.nid=nid;
+ const players=[...(Object.values(F.lineup.A||{})),...(Object.values(F.lineup.B||{}))].filter(Boolean);
+ const i=t?+$("#stad").value:F.stad,w=t?Math.max(1,+$("#weeks").value||1):1;
+ let m="";
+ if(i==null||isNaN(i))m="اختر ملعبا.";else if(!nm)m="أدخل الاسم.";else if(!/^\d{18}$/.test(nid))m="رقم التعريف يجب أن يكون 18 رقما.";
+ else if(!players.length)m="أضف اللاعبين إلى التشكيلة."
+ else if(banned(nid,i))m="هذا الرقم محظور من الحجز.";
+ else for(let k=0;k<w;k++){if(busy(i,addDays(F.date,7*k),F.hour)){m="الملعب محجوز في "+addDays(F.date,7*k);break}}
+ if(m){F.msg=m;render();return}
+ const formation={A:{...F.lineup.A},B:{...F.lineup.B}};
+ await db.collection("res").doc(rid()).set({uid,stad:i,date:F.date,hour:F.hour,name:nm,nid,
+   players,formation,status:"pending",tournament:t,weeks:w,total:t?sdoc(i).price*w:0,at:Date.now()});
+ F.msg="";F.nm="";F.nid="";F.lineup={A:{},B:{}};tab="mine";render();
+}
+
+/* ============================================================
+   8) ربط الأحداث
+   ============================================================ */
+function bind(){
+ const g=id=>document.getElementById(id);
+ const keep=()=>{if(g("nm")){F.nm=g("nm").value;F.nid=g("nid").value}};
+
+ ["date","hour"].forEach(k=>g(k)&&(g(k).onchange=()=>{keep();F[k]=k==="hour"?+g(k).value:g(k).value;render()}));
+ if(g("stad"))g("stad").onchange=()=>{keep();F.stad=g("stad").value===""?null:+g("stad").value;render()};
+ if(g("weeks"))g("weeks").onchange=()=>{keep();F.weeks=Math.max(1,+g("weeks").value||1);render()};
+ if(g("send"))g("send").onclick=()=>submit(false);
+ if(g("sendT"))g("sendT").onclick=()=>submit(true);
+
+ /* محرّر التشكيلة */
+ document.querySelectorAll("[data-team-btn]").forEach(b=>b.onclick=()=>{keep();F.team=b.dataset.teamBtn;render()});
+ document.querySelectorAll("[data-slot]").forEach(b=>b.onclick=()=>openSlot(b.dataset.team,b.dataset.pos));
+ if(g("clearL"))g("clearL").onclick=()=>{F.lineup={A:{},B:{}};render()};
+
+ /* نافذة اللاعب */
+ if(g("msave"))g("msave").onclick=saveSlot;
+ if(g("mdel"))g("mdel").onclick=delSlot;
+ if(g("mcancel"))g("mcancel").onclick=closeModal;
+ if(g("modal"))g("modal").onclick=e=>{if(e.target.id==="modal")closeModal()};
+ if(g("minput"))g("minput").onkeydown=e=>{if(e.key==="Enter")saveSlot()};
+
+ /* المسؤول والإدارة */
+ if(g("asel"))g("asel").onchange=()=>{sel=+g("asel").value;render()};
+ if(g("osel"))g("osel").onchange=()=>{sel=+g("osel").value};
+ if(g("ssave"))g("ssave").onclick=async()=>{await setSt(sel,{name:g("sname").value.trim()||DEF[sel],price:+g("sprice").value||0})};
+ if(g("badd"))g("badd").onclick=()=>{const n=g("bnid").value.trim();if(n)addBan(n,"",g("bwhy").value,sel)};
+ if(g("aadd"))g("aadd").onclick=async()=>{const n=g("an").value.trim(),p=g("ap").value;
+  if(!n||p.length<6){F.msg="أدخل الاسم وكلمة سر من 6 أحرف على الأقل.";render();return}
+  const salt=rid();await db.collection("adm").doc(rid()).set({name:n,stad:+g("osel").value,salt,hash:await sha(salt+p)});F.msg="";render()};
+
+ document.querySelectorAll("[data-ok]").forEach(b=>b.onclick=()=>db.collection("res").doc(b.dataset.ok).update({status:"confirmed"}));
+ document.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>confirm("تأكيد الحذف؟")&&db.collection("res").doc(b.dataset.del).delete());
+ document.querySelectorAll("[data-unban]").forEach(b=>b.onclick=()=>db.collection("bans").doc(b.dataset.unban).delete());
+ document.querySelectorAll("[data-rep]").forEach(b=>b.onclick=()=>{const r=S.res.find(x=>x.id===b.dataset.rep),why=prompt("سبب البلاغ؟");if(why)db.collection("reps").doc(rid()).set({stad:r.stad,name:r.name,nid:r.nid,reason:why,date:today()})});
+ document.querySelectorAll("[data-ban]").forEach(b=>b.onclick=()=>{const r=S.res.find(x=>x.id===b.dataset.ban),why=prompt("سبب الحظر؟");if(why!==null)addBan(r.nid,r.name,why,r.stad)});
+ document.querySelectorAll("[data-rma]").forEach(b=>b.onclick=()=>confirm("حذف الحساب؟")&&db.collection("adm").doc(b.dataset.rma).delete());
+
+ if(g("lgo"))g("lgo").onclick=doLogin;
+ if(g("lp"))g("lp").onkeydown=e=>{if(e.key==="Enter")doLogin()};
+ document.querySelectorAll("[data-h]").forEach(b=>b.onclick=()=>{keep();F.hour=+b.dataset.h;render()});
+}
+
+/* ============================================================
+   9) الإقلاع والاتصال بقاعدة البيانات
+   ============================================================ */
+/* وضع العرض التجريبي: يعمل تلقائياً عند فتح الملف خارج التطبيق (لا يمسّ النسخة الحقيقية) */
+function mockEnv(){
+ const data={st:{},adm:{},res:{},bans:{},reps:{}},subs=[];
+ const docs=n=>Object.entries(data[n]||{}).map(([id,v])=>({id,data:()=>({...v})}));
+ const notify=()=>subs.forEach(f=>f());
+ const col=n=>({onSnapshot(cb){const f=()=>cb({docs:docs(n)});subs.push(f);f();return()=>{}},
+  doc:id=>({set:o=>{data[n][id]={...data[n][id],...o};notify()},
+            update:o=>{data[n][id]={...(data[n][id]||{}),...o};notify()},
+            delete:()=>{delete data[n][id];notify()}})});
+ const d=today();
+ data.res.r1={uid:"demo",stad:0,date:d,hour:18,name:"أحمد بن علي",nid:"012345678901234567",players:["مروان","ياسين"],
+  formation:{A:{GK:"مروان",RB:"ياسين",LB:"كريم",CB1:"سفيان",CB2:"أنيس",CM:"نبيل",ST1:"رضا",ST2:"وليد"},
+             B:{GK:"زكرياء",RB:"إيهاب",CB1:"مهدي",ST1:"أسامة"}},status:"confirmed",tournament:false,weeks:1,total:0,at:Date.now()};
+ data.res.r2={uid:"other",stad:2,date:d,hour:20,name:"سمير",nid:"771234567890123456",players:["خالد"],
+  formation:{A:{GK:"خالد"},B:{}},status:"pending",tournament:true,weeks:4,total:4000,at:Date.now()};
+ return {db:{collection:col},user:{id:async()=>"demo",isOwner:async()=>true}};
+}
+(async()=>{
+ try{ user=await claude.use("user");db=await claude.use("db");}catch(e){}
+ if(!db||!user){ /* لا يوجد استضافة: شغّل وضع العرض التجريبي محلياً */
+   try{const m=mockEnv();db=m.db;user=m.user;
+     if(localStorage.getItem("malabi-demo-login")==="1")curId="demo-admin";
+   }catch(e2){$("#app").innerHTML="<p class='err'>يرجى تسجيل الدخول لاستخدام التطبيق.</p>";return}}
+ uid=await user.id();isOwner=await user.isOwner();try{curId=sessionStorage.getItem("adm")}catch(e){}
+ const sub=(n,f)=>db.collection(n).onSnapshot(s=>{f(s.docs.map(d=>({id:d.id,...d.data()})));render()});
+ sub("st",a=>{S.st={};a.forEach(x=>S.st[x.id]=x)});
+ sub("adm",a=>S.adm=a);sub("res",a=>S.res=a);sub("bans",a=>S.bans=a);sub("reps",a=>S.reps=a);
+ render();
+})();
+</script></body></html>
